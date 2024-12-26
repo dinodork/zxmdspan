@@ -5,24 +5,23 @@
 #include <zx_colors.hpp>
 #include <zx_graphics.hpp>
 
-// using namespace std;
-using std::cout;
-using std::ofstream;
-using std::vector;
+using namespace std;
 
 int main() {
   vector<uint8_t> imageFile(32 * 24 * 8, 0);
   vector<uint8_t> attributeFile(32 * 24, INK_BLACK | PAPER_WHITE);
 
   zxspectrum::ByteSpan ifs(imageFile.data());
-  zxspectrum::ByteSpan bits(ifs);
+  zxspectrum::BitSpan bits(imageFile.data());
 
   for (int i = 0; i < 8; ++i) {
     ifs[16, 80 + i] = i;
     ifs[20 + i, 120] = i;
   }
 
-  cout << "Hello!\n";
+  for (int i = 0; i < 100; ++i) {
+    bits[i, i] = 1;
+  }
 
   ofstream myfile;
   myfile.open("myimage.scr");
