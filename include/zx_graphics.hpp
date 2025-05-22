@@ -3,7 +3,7 @@
 
 namespace zxspectrum {
 
-using Word = std::uint16_t;
+using word_t = std::uint16_t;
 
 /*
   How to translate the screen memory address:
@@ -12,8 +12,8 @@ using Word = std::uint16_t;
                --+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--
   Coordinate    0| 0| 0|Y7|Y6|Y2|Y1|Y0|Y5|Y4|Y3|X4|X3|X2|X1|X0
 */
-Word byteAddress(std::uint8_t x_byte, std::uint8_t y_pixel) {
-  Word byte_offset = x_byte;
+word_t byteAddress(std::uint8_t x_byte, std::uint8_t y_pixel) {
+  word_t byte_offset = x_byte;
   byte_offset |= (y_pixel & 0x07) << 8;
   byte_offset |= (y_pixel & 0X38) << 2;
   byte_offset |= (y_pixel & 0xC0) << 5;
@@ -21,8 +21,8 @@ Word byteAddress(std::uint8_t x_byte, std::uint8_t y_pixel) {
 }
 
 // The ZX Spectrum image file is a memory area of 192 rows of 32 bytes each,
-// addressable using a two-byte unsigned integer.
-using ImageFile = Kokkos::extents<std::uint16_t, 32, 192>;
+// addressable using a 16 bit machine word.
+using ImageFile = Kokkos::extents<word_t, 32, 192>;
 
 struct ByteLayout {
   template <class Extents> class mapping {
@@ -73,7 +73,7 @@ struct BitAccessorPolicy {
 
   struct BitReference {
     data_handle_type p;
-    std::uint16_t i;
+    word_t i;
     BitReference operator=(element_type v) {
       std::uint8_t mask = 0x80 >> i % 8;
       if (v) {
@@ -85,8 +85,7 @@ struct BitAccessorPolicy {
     }
   };
 
-  constexpr reference access(data_handle_type p,
-                             std::uint16_t i) const noexcept {
+  constexpr reference access(data_handle_type p, word_t i) const noexcept {
     return {p + i / 8, i};
   }
 };
